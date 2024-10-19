@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
 
 // Configuração de CORS atualizada para permitir o frontend no Vercel
 app.use(cors({
-  origin: ['https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app'],
+  origin: ['https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app', 'http://localhost:4200'],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));

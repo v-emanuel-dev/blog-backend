@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
 
 // Outras configurações de CORS
 app.use(cors({
-  origin: 'https:/star-blog-frontend-production.up.railway.app:4200',
+  origin: 'https://star-blog-frontend-six.vercel.app',
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));

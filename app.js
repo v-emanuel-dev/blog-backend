@@ -50,8 +50,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-const PORT = process.env.PORT || 3000;
-
 // Suas rotas
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

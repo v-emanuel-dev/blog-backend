@@ -62,6 +62,10 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/users', userRoutes);
 
 // Iniciar o servidor
-server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => { // Escutando em 0.0.0.0
+  const host = process.env.RAILWAY_PRIVATE_DOMAIN 
+              ? `http://${process.env.RAILWAY_PRIVATE_DOMAIN}` 
+              : `http://localhost:${PORT}`;
+  
+  console.log(`Server is running on ${host}`);
 });

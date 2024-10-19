@@ -11,7 +11,7 @@ const passport = require('./config/passport');
 const cors = require('cors');
 require('dotenv').config();
 const http = require('http');
-const { initSocket } = require('./socket'); // Importando a função de inicialização do Socket.io
+const { initSocket } = require('./socket');
 
 const app = express();
 const server = http.createServer(app);
@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
 
 // Outras configurações de CORS
 app.use(cors({
-  origin: 'http://localhost:4200', // Você pode ajustar isso para permitir o seu frontend na nuvem também
+  origin: 'https:/star-blog-frontend-production.up.railway.app:4200',
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
@@ -63,5 +63,5 @@ app.use('/api/users', userRoutes);
 
 // Iniciar o servidor
 server.listen(PORT, () => {
-  console.log(`Server is running on http://blog-backend-production-c203.up.railway.app${PORT}`);
+  console.log(`Server is running on https://blog-backend-production-c203.up.railway.app${PORT}`);
 });

@@ -62,5 +62,7 @@ app.use('/api/users', userRoutes);
 
 // Iniciar o servidor
 server.listen(PORT, () => {
-  console.log(`Server is running on http://blog-backend-production-c203.up.railway.app:${PORT}`);
+  console.log(`Server is running on http://blog-backend-production-c203.up.railway.app${PORT}`);
+  console.log(`Server is listening on port ${PORT}`);
 });
+

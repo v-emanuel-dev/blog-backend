@@ -17,4 +17,5 @@ connection.connect((err) => {
   console.log('Connected to database as id ' + connection.threadId);
 });
 
-module.exports = db; // Certifique-se de que está exportando a instância 'db'
+// Exporte a instância 'connection' em vez de 'db'
+module.exports = connection;

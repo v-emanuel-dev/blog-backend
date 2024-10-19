@@ -50,7 +50,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-const PORT = process.env.PORT || 3000; // Porta fornecida pelo Railway
+const PORT = process.env.PORT || 8080;
 
 // Suas rotas
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -62,9 +62,6 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/users', userRoutes);
 
 // Iniciar o servidor
-server.listen(PORT, '0.0.0.0', () => {
-  const host = process.env.RAILWAY_PRIVATE_DOMAIN 
-              ? `http://${process.env.RAILWAY_PRIVATE_DOMAIN}` 
-              : `http://localhost:${PORT}`;
-  console.log(`Server is running on ${host}`);
+server.listen(PORT, () => {
+  console.log(`Server is running on http://blog-backend-production-c203.up.railway.app${PORT}`);
 });

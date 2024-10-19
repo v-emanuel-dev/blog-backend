@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
 
 // Outras configurações de CORS
 app.use(cors({
-  origin: 'http://localhost:4200',
+  origin: 'http://localhost:4200', // Você pode ajustar isso para permitir o seu frontend na nuvem também
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
@@ -50,6 +50,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+const PORT = process.env.PORT || 3000; // Porta fornecida pelo Railway
+
 // Suas rotas
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -60,10 +62,9 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/users', userRoutes);
 
 // Iniciar o servidor
-const server = app.listen(PORT, '0.0.0.0', () => { // Escutando em 0.0.0.0
+server.listen(PORT, '0.0.0.0', () => {
   const host = process.env.RAILWAY_PRIVATE_DOMAIN 
               ? `http://${process.env.RAILWAY_PRIVATE_DOMAIN}` 
               : `http://localhost:${PORT}`;
-  
   console.log(`Server is running on ${host}`);
 });

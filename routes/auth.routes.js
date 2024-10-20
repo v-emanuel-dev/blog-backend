@@ -44,7 +44,7 @@ router.get(
     };
 
     // Redirecionar para o frontend com os dados
-    const frontendUrl = `https://blog-backend-production-c203.up.railway.app/blog?token=${token}&userId=${user.id}&email=${user.email}&username=${user.username}&profilePicture=${user.profilePicture}`;
+    const frontendUrl = `https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app/blog?token=${token}&userId=${user.id}&email=${user.email}&username=${user.username}&profilePicture=${user.profilePicture}`;
     res.redirect(frontendUrl);
   }
 );

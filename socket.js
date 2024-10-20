@@ -5,7 +5,7 @@ let io; // Variável global para a instância do Socket.io
 const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: "https://blog-backend-production-c203.up.railway.app", // URL do frontend
+      origin: "https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app", // URL do frontend
       methods: ["GET", "POST"],
       credentials: true,
     },

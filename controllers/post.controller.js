@@ -81,8 +81,6 @@ exports.getPostsAdmin = (req, res) => {
 // Função para listar todos os posts, incluindo públicos e os do usuário logado
 exports.getAllPosts = (req, res) => {
   const userId = req.userId; // O ID do usuário vem do token JWT decodificado
-  console.log("User ID:", userId); // Log do ID do usuário
-
   // Consulta SQL para buscar posts, usuários, comentários e categorias
   const query = `
   SELECT 
@@ -198,15 +196,6 @@ exports.getPostById = (req, res) => {
 exports.createPost = (req, res) => {
   const { title, content, user_id, visibility, categoryIds } = req.body; // Mudança para categoryIds
 
-  // Logando a requisição recebida
-  console.log("Received request to create post:", {
-    title,
-    content,
-    user_id,
-    visibility,
-    categoryIds,
-  });
-
   // Verifica se os campos obrigatórios estão preenchidos
   if (
     !title ||
@@ -236,8 +225,7 @@ exports.createPost = (req, res) => {
     }
 
     const postId = result.insertId;
-    console.log("Post created successfully with ID:", postId);
-
+    
     // Prepara a query para associar múltiplas categorias ao post
     const categoryQueries = categoryIds.map((categoryId) => {
       return new Promise((resolve, reject) => {

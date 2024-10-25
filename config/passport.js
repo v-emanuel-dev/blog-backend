@@ -12,7 +12,6 @@ passport.use(new GoogleStrategy({
   const username = profile.displayName.replace(/\s+/g, '').toLowerCase(); // Ajuste do nome de usuário
   const profilePicture = profile.photos[0]?.value || null;
 
-  console.log('Searching for user by email:', email); // Log da busca do usuário
   User.findByEmail(email, (err, user) => {
     if (err) {
       console.error('Error finding user by email:', err);
@@ -20,7 +19,6 @@ passport.use(new GoogleStrategy({
     }
 
     if (user) {
-      console.log('User found in the database:', user);
       return done(null, user);
     } else {
       console.log('User not found, creating a new one');
@@ -35,7 +33,6 @@ passport.use(new GoogleStrategy({
           console.error('Error creating new user:', err);
           return done(err);
         }
-        console.log('New user created:', newUser);
         return done(null, newUser);
       });
     }
@@ -43,12 +40,10 @@ passport.use(new GoogleStrategy({
 }));
 
 passport.serializeUser((user, done) => {
-  console.log('Serializing user with ID:', user.id); // Log para serialização
   done(null, user.id); // Serializa apenas o ID do usuário
 });
 
 passport.deserializeUser((id, done) => {
-  console.log('Deserializing user with ID:', id); // Log para deserialização
   User.findById(id, (err, user) => {
     if (err) {
       console.error('Error deserializing user:', err);

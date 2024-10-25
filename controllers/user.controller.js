@@ -141,63 +141,69 @@ exports.getUserById = (req, res) => {
     });
 };
 
-// Função para deletar um usuário (apenas para admins)
-// userController.js
 exports.deleteUser = (req, res) => {
-    const userId = req.params.id;
+    const userId = parseInt(req.params.id);  // Converte userId para número
     console.log('Request to delete user received'); // Log para verificar a requisição
     console.log('User ID to delete:', userId); // Log do ID do usuário recebido
 
-    // Verifica se o userId é um número
     if (isNaN(userId)) {
         console.warn('Invalid user ID format:', userId);
         return res.status(400).json({ message: 'Invalid user ID format.' });
     }
 
-    // Desativar verificações de chave estrangeira
-    db.query('SET FOREIGN_KEY_CHECKS = 0', (err) => {
+    // Primeiro, verifica se o usuário existe
+    db.query('SELECT * FROM users WHERE id = ?', [userId], (err, results) => {
         if (err) {
-            console.error('Error disabling foreign key checks:', err);
-            return res.status(500).json({ message: 'Error disabling foreign key checks', error: err });
+            console.error('Database error while checking user existence:', err);
+            return res.status(500).json({ message: 'Database error while checking user existence', error: err });
         }
-        console.log('Foreign key checks disabled'); // Log de sucesso
+        if (results.length === 0) {
+            console.warn('No user found with ID:', userId);
+            return res.status(404).json({ message: 'User not found' });
+        }
 
-        // Deletar os likes do usuário
-        const deleteLikesQuery = 'DELETE FROM likes WHERE user_id = ?';
-        db.query(deleteLikesQuery, [userId], (err, results) => {
+        console.log('User found. Proceeding with deletion steps.'); // Log para indicar que o usuário existe
+
+        // Desativar verificações de chave estrangeira
+        db.query('SET FOREIGN_KEY_CHECKS = 0', (err) => {
             if (err) {
-                console.error('Database error during likes deletion:', err);
-                return res.status(500).json({ message: 'Database error during likes deletion', error: err });
+                console.error('Error disabling foreign key checks:', err);
+                return res.status(500).json({ message: 'Error disabling foreign key checks', error: err });
             }
-            console.log('Likes deleted successfully for user ID:', userId); // Log de sucesso da deleção dos likes
+            console.log('Foreign key checks disabled'); // Log de sucesso
 
-            // Deletar os comentários do usuário
-            const deleteCommentsQuery = 'DELETE FROM comments WHERE user_id = ?';
-            db.query(deleteCommentsQuery, [userId], (err, results) => {
-                if (err) {
-                    console.error('Database error during comments deletion:', err);
-                    return res.status(500).json({ message: 'Database error during comments deletion', error: err });
-                }
-                console.log('Comments deleted successfully for user ID:', userId); // Log de sucesso da deleção dos comentários
+            // Deleta likes, comentários e posts
+            const deleteQueries = [
+                { query: 'DELETE FROM likes WHERE user_id = ?', name: 'Likes' },
+                { query: 'DELETE FROM comments WHERE user_id = ?', name: 'Comments' },
+                { query: 'DELETE FROM posts WHERE user_id = ?', name: 'Posts' }
+            ];
 
-                // Deletar os posts do usuário
-                const deletePostsQuery = 'DELETE FROM posts WHERE user_id = ?';
-                db.query(deletePostsQuery, [userId], (err, results) => {
-                    if (err) {
-                        console.error('Database error during posts deletion:', err);
-                        return res.status(500).json({ message: 'Database error during posts deletion', error: err });
-                    }
-                    console.log('Posts deleted successfully for user ID:', userId); // Log de sucesso da deleção dos posts
+            let deleteIndex = 0;
 
-                    // Deletar o usuário
-                    const deleteUserQuery = 'DELETE FROM users WHERE id = ?';
-                    db.query(deleteUserQuery, [userId], (err, results) => {
+            const executeNextQuery = () => {
+                if (deleteIndex < deleteQueries.length) {
+                    const { query, name } = deleteQueries[deleteIndex];
+                    db.query(query, [userId], (err, results) => {
                         if (err) {
-                            console.error('Database error during deletion:', err);
-                            return res.status(500).json({ message: 'Database error', error: err });
+                            console.error(`Database error during ${name.toLowerCase()} deletion:`, err);
+                            return res.status(500).json({ message: `Database error during ${name.toLowerCase()} deletion`, error: err });
+                        }
+                        console.log(`${name} deleted successfully for user ID:`, userId); // Log para cada etapa de deleção
+                        deleteIndex++;
+                        executeNextQuery();
+                    });
+                } else {
+                    console.log('All related data deleted. Proceeding to delete user.'); // Log após deletar dados relacionados
+
+                    // Deleta o usuário após as tabelas relacionadas
+                    db.query('DELETE FROM users WHERE id = ?', [userId], (err, results) => {
+                        if (err) {
+                            console.error('Database error during user deletion:', err);
+                            return res.status(500).json({ message: 'Database error during user deletion', error: err });
                         }
 
-                        console.log('Deletion results:', results); // Log dos resultados da deleção
+                        console.log('User deletion results:', results); // Log dos resultados da deleção do usuário
 
                         if (results.affectedRows === 0) {
                             console.warn('No user found with ID:', userId);
@@ -206,7 +212,6 @@ exports.deleteUser = (req, res) => {
 
                         console.log('User deleted successfully with ID:', userId); // Log de sucesso da deleção
 
-                        // Reativar verificações de chave estrangeira
                         db.query('SET FOREIGN_KEY_CHECKS = 1', (err) => {
                             if (err) {
                                 console.error('Error re-enabling foreign key checks:', err);
@@ -217,11 +222,15 @@ exports.deleteUser = (req, res) => {
                             res.status(200).json({ message: 'User and related data deleted successfully' });
                         });
                     });
-                });
-            });
+                }
+            };
+
+            executeNextQuery();
         });
     });
 };
+
+
 
 
   

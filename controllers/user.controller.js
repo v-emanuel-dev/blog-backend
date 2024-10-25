@@ -133,7 +133,7 @@ exports.getUserById = (req, res) => {
                 user.profilePicture = user.profilePicture;
             } else {
                 // É um caminho local, troca barras invertidas por barras normais e adiciona o prefixo
-                user.profilePicture = `https://blog-backend-production-c203.up.railway.app/${user.profilePicture.replace(/\\/g, '/')}`;
+                user.profilePicture = `http://localhost:3000/${user.profilePicture.replace(/\\/g, '/')}`;
             }
         }        
     
@@ -142,40 +142,89 @@ exports.getUserById = (req, res) => {
 };
 
 // Função para deletar um usuário (apenas para admins)
+// userController.js
 exports.deleteUser = (req, res) => {
     const userId = req.params.id;
-    const requestingUserRole = req.userRole; // Supondo que você tenha configurado o middleware que adiciona o papel do usuário na requisição
+    console.log('Request to delete user received'); // Log para verificar a requisição
+    console.log('User ID to delete:', userId); // Log do ID do usuário recebido
 
-    console.log('Received delete request for user ID:', userId); // Log do ID do usuário
-    console.log('Requesting user role:', requestingUserRole); // Log do papel do usuário
-
-    // Verifica se o ID do usuário é um número válido
+    // Verifica se o userId é um número
     if (isNaN(userId)) {
-        console.warn('Invalid user ID received:', userId);
-        return res.status(400).json({ message: 'Invalid user ID.' });
+        console.warn('Invalid user ID format:', userId);
+        return res.status(400).json({ message: 'Invalid user ID format.' });
     }
 
-    // Somente administradores podem deletar usuários
-    if (requestingUserRole !== 'admin') {
-        console.warn('Access denied for user role:', requestingUserRole);
-        return res.status(403).json({ message: 'Access denied. Only administrators can delete users.' });
-    }
-
-    const deleteQuery = 'DELETE FROM users WHERE id = ?';
-
-    db.query(deleteQuery, [userId], (error, results) => {
-        if (error) {
-            console.error('Error executing query', error);
-            return res.status(500).json({ message: 'Internal server error.' });
+    // Desativar verificações de chave estrangeira
+    db.query('SET FOREIGN_KEY_CHECKS = 0', (err) => {
+        if (err) {
+            console.error('Error disabling foreign key checks:', err);
+            return res.status(500).json({ message: 'Error disabling foreign key checks', error: err });
         }
+        console.log('Foreign key checks disabled'); // Log de sucesso
 
-        if (results.affectedRows === 0) {
-            console.warn('No user found with ID:', userId); // Log quando nenhum usuário é encontrado
-            return res.status(404).json({ message: 'User not found.' });
-        }
+        // Deletar os likes do usuário
+        const deleteLikesQuery = 'DELETE FROM likes WHERE user_id = ?';
+        db.query(deleteLikesQuery, [userId], (err, results) => {
+            if (err) {
+                console.error('Database error during likes deletion:', err);
+                return res.status(500).json({ message: 'Database error during likes deletion', error: err });
+            }
+            console.log('Likes deleted successfully for user ID:', userId); // Log de sucesso da deleção dos likes
 
-        console.log('User deleted successfully with ID:', userId);
-        res.status(200).json({ message: 'User deleted successfully' });
+            // Deletar os comentários do usuário
+            const deleteCommentsQuery = 'DELETE FROM comments WHERE user_id = ?';
+            db.query(deleteCommentsQuery, [userId], (err, results) => {
+                if (err) {
+                    console.error('Database error during comments deletion:', err);
+                    return res.status(500).json({ message: 'Database error during comments deletion', error: err });
+                }
+                console.log('Comments deleted successfully for user ID:', userId); // Log de sucesso da deleção dos comentários
+
+                // Deletar os posts do usuário
+                const deletePostsQuery = 'DELETE FROM posts WHERE user_id = ?';
+                db.query(deletePostsQuery, [userId], (err, results) => {
+                    if (err) {
+                        console.error('Database error during posts deletion:', err);
+                        return res.status(500).json({ message: 'Database error during posts deletion', error: err });
+                    }
+                    console.log('Posts deleted successfully for user ID:', userId); // Log de sucesso da deleção dos posts
+
+                    // Deletar o usuário
+                    const deleteUserQuery = 'DELETE FROM users WHERE id = ?';
+                    db.query(deleteUserQuery, [userId], (err, results) => {
+                        if (err) {
+                            console.error('Database error during deletion:', err);
+                            return res.status(500).json({ message: 'Database error', error: err });
+                        }
+
+                        console.log('Deletion results:', results); // Log dos resultados da deleção
+
+                        if (results.affectedRows === 0) {
+                            console.warn('No user found with ID:', userId);
+                            return res.status(404).json({ message: 'User not found' });
+                        }
+
+                        console.log('User deleted successfully with ID:', userId); // Log de sucesso da deleção
+
+                        // Reativar verificações de chave estrangeira
+                        db.query('SET FOREIGN_KEY_CHECKS = 1', (err) => {
+                            if (err) {
+                                console.error('Error re-enabling foreign key checks:', err);
+                                return res.status(500).json({ message: 'Error re-enabling foreign key checks', error: err });
+                            }
+
+                            console.log('Foreign key checks re-enabled'); // Log de sucesso
+                            res.status(200).json({ message: 'User and related data deleted successfully' });
+                        });
+                    });
+                });
+            });
+        });
     });
 };
+
+
+  
+  
+  
 

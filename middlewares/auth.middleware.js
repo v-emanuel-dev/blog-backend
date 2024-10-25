@@ -5,18 +5,26 @@ exports.verifyToken = (req, res, next) => {
 
   if (!token) {
     console.log("No token provided, proceeding as guest");
-    req.userId = null; // Ou qualquer valor que indique que é um usuário não autenticado
+    req.userId = null;
+    req.userRole = 'guest';
     return next();
   }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       console.error("Failed to authenticate token:", err);
-      req.userId = null; // Se o token falhar, tratá-lo como um visitante
-      return next();
+
+      // Se o erro for de token expirado, você pode retornar 401 ou 403
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Token expired, please log in again.' });
+      }
+
+      return res.status(403).json({ message: 'Failed to authenticate token.' });
     }
 
     req.userId = decoded.id;
+    req.userRole = decoded.role;
     next();
   });
 };
+

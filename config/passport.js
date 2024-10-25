@@ -5,7 +5,7 @@ const User = require('../models/user');
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://blog-backend-production-c203.up.railway.app/api/auth/google/callback",
+  callbackURL: "http://localhost:3000/api/auth/google/callback",
 }, (accessToken, refreshToken, profile, done) => {
   console.log('Google profile received:', profile); // Log para verificar o perfil do Google
   

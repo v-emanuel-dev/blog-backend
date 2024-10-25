@@ -29,9 +29,9 @@ io.on('connection', (socket) => {
   });
 });
 
-// Configuração de CORS atualizada para permitir o frontend no Vercel
+// Outras configurações de CORS
 app.use(cors({
-  origin: ['https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app', 'http://localhost:4200'],
+  origin: 'https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app',
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
@@ -41,7 +41,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configuração do middleware de sessão
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your_secret_key',
+  secret: process.env.SESSION_SECRET || '897050777993-vdftnmm2c9va2om85dri1cfi8caSPX-oNSFprYK5iX2Ny',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false } // Defina como true se estiver usando HTTPS
@@ -50,10 +50,11 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 
 // Suas rotas
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use("/api/categories", categoryRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
@@ -65,4 +66,3 @@ server.listen(PORT, () => {
   console.log(`Server is running on https://blog-backend-production-c203.up.railway.app:${PORT}`);
   console.log(`Server is listening on port ${PORT}`);
 });
-

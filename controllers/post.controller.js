@@ -109,8 +109,6 @@ exports.getAllPosts = (req, res) => {
       return res.status(500).json({ error: err.message });
     }
 
-    console.log("Results da consulta:", results); // Log dos resultados da consulta
-
     // Organizar resultados para incluir comentários e categorias nos posts
     const postsWithDetails = results.reduce((acc, post) => {
       const {
@@ -153,8 +151,6 @@ exports.getAllPosts = (req, res) => {
       }
       return acc;
     }, []);
-
-    console.log("Posts com detalhes:", postsWithDetails); // Log dos posts processados
     res.json(postsWithDetails); // Retorna posts com comentários e categorias
   });
 };

@@ -133,7 +133,7 @@ exports.getUserById = (req, res) => {
                 user.profilePicture = user.profilePicture;
             } else {
                 // É um caminho local, troca barras invertidas por barras normais e adiciona o prefixo
-                user.profilePicture = `http://localhost:3000/${user.profilePicture.replace(/\\/g, '/')}`;
+                user.profilePicture = `https://blog-backend-production-c203.up.railway.app/${user.profilePicture.replace(/\\/g, '/')}`;
             }
         }        
     

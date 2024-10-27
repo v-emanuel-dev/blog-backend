@@ -14,39 +14,48 @@ exports.getAllUsers = (req, res) => {
     });
 };
 
-exports.getUserById = (req, res) => {
-    const userId = req.params.id;
+exports.updateUser = (req, res) => {
+    const { username, email, password } = req.body;
+    const userId = req.userId; // O ID do usuário é obtido do token JWT
+    const profilePicture = req.file ? req.file.path : null;
 
-    if (isNaN(userId)) {
-        return res.status(400).json({ message: 'Invalid user ID.' });
+    console.log('Update User Request Received');
+    console.log('User ID:', userId);
+    console.log('Username:', username);
+    console.log('Email:', email);
+    console.log('Profile Picture Provided:', profilePicture ? 'Yes' : 'No');
+
+    let updateQuery = 'UPDATE users SET username = ?, email = ?';
+    const queryParams = [username, email];
+
+    if (profilePicture) {
+        updateQuery += ', profilePicture = ?';
+        queryParams.push(profilePicture);
     }
 
-    const query = 'SELECT id, username, email, profilePicture FROM users WHERE id = ?';
-    db.query(query, [userId], (error, results) => {
-        if (error) {
-            console.error('Error executing query', error);
-            return res.status(500).json({ message: 'Internal server error.' });
+    if (password) {
+        const hashedPassword = bcrypt.hashSync(password, 10);
+        updateQuery += ', password = ?';
+        queryParams.push(hashedPassword);
+    }
+
+    updateQuery += ' WHERE id = ?';
+    queryParams.push(userId);
+
+    db.query(updateQuery, queryParams, (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ message: 'Database error', error: err });
         }
-    
-        if (results.length === 0) {
-            return res.status(404).json({ message: 'User not found.' });
+        if (results.affectedRows === 0) {
+            console.warn('No user found with ID:', userId);
+            return res.status(404).json({ message: 'User not found' });
         }
-    
-        const user = results[0];
-    
-        // Verifica se a imagem de perfil existe e trata dependendo do formato
-        if (user.profilePicture) {
-            // Verifica se a imagem é uma URL completa
-            if (user.profilePicture.startsWith('http://') || user.profilePicture.startsWith('https://')) {
-                // É uma URL externa (como do Google), mantém a URL externa como está
-                user.profilePicture = user.profilePicture;
-            } else {
-                // É um caminho local, troca barras invertidas por barras normais e adiciona o prefixo
-                user.profilePicture = `https://blog-backend-production-c203.up.railway.app/${user.profilePicture.replace(/\\/g, '/')}`;
-            }
-        }        
-    
-        res.status(200).json(user);
+        console.log('User information updated successfully for ID:', userId);
+        res.status(200).json({ 
+            message: 'User information updated successfully',
+            profilePicture: profilePicture ? `http://localhost:3000/${profilePicture}` : null 
+        });
     });
 };
 
@@ -137,7 +146,6 @@ exports.getUserById = (req, res) => {
 };
 
 // Função para deletar um usuário (apenas para admins)
-// userController.js
 exports.deleteUser = (req, res) => {
     const userId = req.params.id;
     console.log('Request to delete user received'); // Log para verificar a requisição

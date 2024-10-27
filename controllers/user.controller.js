@@ -52,13 +52,9 @@ exports.updateUser = (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
         console.log('User information updated successfully for ID:', userId);
-        res.status(200).json({ 
-            message: 'User information updated successfully',
-            profilePicture: profilePicture ? `http://localhost:3000/${profilePicture}` : null 
-        });
+        res.status(200).json({ message: 'User information updated successfully' });
     });
 };
-
 
 exports.updateUserAdmin = (req, res) => {
     const { username, email, password, role } = req.body;

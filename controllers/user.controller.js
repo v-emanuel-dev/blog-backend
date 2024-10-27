@@ -54,7 +54,7 @@ exports.updateUser = (req, res) => {
         console.log('User information updated successfully for ID:', userId);
         res.status(200).json({ 
             message: 'User information updated successfully',
-            profilePicture: profilePicture ? `http://localhost:3000/${profilePicture}` : null 
+            profilePicture: profilePicture ? `https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app/${profilePicture}` : null 
         });
     });
 };
@@ -137,7 +137,7 @@ exports.getUserById = (req, res) => {
                 user.profilePicture = user.profilePicture;
             } else {
                 // É um caminho local, troca barras invertidas por barras normais e adiciona o prefixo
-                user.profilePicture = `http://localhost:3000/${user.profilePicture.replace(/\\/g, '/')}`;
+                user.profilePicture = `https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app/${user.profilePicture.replace(/\\/g, '/')}`;
             }
         }        
     

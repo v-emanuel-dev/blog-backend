@@ -45,7 +45,7 @@ exports.updateUser = (req, res) => {
     res.status(200).json({
       message: "User information updated successfully",
       profilePicture: profilePicture
-        ? `http://localhost:3000/${profilePicture}`
+        ? `https://blog-backend-production-c203.up.railway.app/${profilePicture}`
         : null,
     });
   });
@@ -116,7 +116,7 @@ exports.getUserById = (req, res) => {
       ) {
         user.profilePicture = user.profilePicture;
       } else {
-        user.profilePicture = `http://localhost:3000/${user.profilePicture.replace(
+        user.profilePicture = `https://blog-backend-production-c203.up.railway.app/${user.profilePicture.replace(
           /\\/g,
           "/"
         )}`;

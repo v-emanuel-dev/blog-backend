@@ -38,7 +38,7 @@ router.get(
       userRole: user.role,
     };
 
-    const frontendUrl = `http://localhost:4200/blog?token=${token}&accessToken=${token}&userId=${user.id}&email=${user.email}&username=${user.username}&profilePicture=${user.profilePicture}&userRole=${user.role}`;
+    const frontendUrl = `https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app/blog?token=${token}&accessToken=${token}&userId=${user.id}&email=${user.email}&username=${user.username}&profilePicture=${user.profilePicture}&userRole=${user.role}`;
 
     res.redirect(frontendUrl);
   }

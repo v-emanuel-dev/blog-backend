@@ -5,7 +5,7 @@ let io;
 const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: "http://localhost:4200",
+      origin: "https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app",
       methods: ["GET", "POST"],
       credentials: true,
     },

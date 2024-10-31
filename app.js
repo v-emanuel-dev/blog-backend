@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
 
 app.use(
   cors({
-    origin: "http://localhost:4200",
+    origin: "https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -61,6 +61,6 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/users", userRoutes);
 
 server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on https://star-blog-frontend-git-main-vemanueldevs-projects.vercel.app:${PORT}`);
   console.log(`Server is listening on port ${PORT}`);
 });
